@@ -9,6 +9,8 @@ class Tab1 extends StatelessWidget {
     print("Tab 1 constructor");
   }
 
+  TextEditingController limitController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,11 +86,13 @@ class Tab1 extends StatelessWidget {
                                 icon: const Icon(Icons.chevron_left_outlined))
                             : const SizedBox.shrink(),
                         SizedBox(
-                          width: 150,
+                          width: 120,
                           child: TextField(
+                            controller: limitController
+                              ..text = state.picsLimit?.toString() ?? "100",
                             onSubmitted: (limit) {
                               int? intLimit = int.tryParse(limit);
-                              if (intLimit != null) {
+                              if (intLimit != null && intLimit < 101 && intLimit > 0) {
                                 context
                                     .read<PicturesCubit>()
                                     .onLimitChanged(intLimit);
@@ -96,6 +100,7 @@ class Tab1 extends StatelessWidget {
                                 print("this should be an integer");
                               }
                             },
+                            textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
                                 label: Text(
@@ -103,6 +108,20 @@ class Tab1 extends StatelessWidget {
                             )),
                           ),
                         ),
+                        IconButton(
+                            onPressed: () {
+                              int? intLimit =
+                                  int.tryParse(limitController.text);
+                              if (intLimit != null && intLimit < 101 && intLimit > 0) {
+                                context
+                                    .read<PicturesCubit>()
+                                    .onLimitChanged(intLimit);
+                              } else {
+                                print("this should be an integer");
+                                //handle corner cases
+                              }
+                            },
+                            icon: const Icon(Icons.send)),
                         Text("Current page ${state.pageNumber ?? 1}"),
                         state.hasNext == true
                             ? IconButton(
